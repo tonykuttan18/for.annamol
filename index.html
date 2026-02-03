@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>For Annamol✨</title>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --gram-green: #a3b18a; 
+      --deep-green: #344e41;
+      --glass: rgba(255, 255, 255, 0.25);
+      --text: #fefae0;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      height: 100svh;
+      background: linear-gradient(135deg, #a3b18a 0%, #588157 100%);
+      font-family: 'Inter', sans-serif;
+      overflow: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: var(--text);
+    }
+
+    /* Autoplay Bypass Overlay */
+    #overlay {
+      position: fixed;
+      inset: 0;
+      background: #344e41;
+      z-index: 2000;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      transition: opacity 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    #startBtn {
+      background: transparent;
+      color: var(--text);
+      padding: 18px 45px;
+      font-size: 24px;
+      border: 2px solid var(--text);
+      border-radius: 100px;
+      cursor: pointer;
+      font-family: 'Dancing Script', cursive;
+      transition: all 0.4s ease;
+    }
+
+    #startBtn:hover {
+      background: var(--text);
+      color: var(--deep-green);
+    }
+
+    /* Floating Hearts */
+    .heart {
+      position: absolute;
+      color: rgba(254, 250, 224, 0.3);
+      font-size: 14px;
+      pointer-events: none;
+      animation: drift 30s linear infinite;
+    }
+
+    @keyframes drift {
+      0% { transform: translateY(110vh) rotate(0deg); opacity: 0; }
+      20% { opacity: 0.8; }
+      100% { transform: translateY(-10vh) rotate(360deg); opacity: 0; }
+    }
+
+    #story-container {
+      text-align: center;
+      padding: 40px;
+      width: 95%;
+      max-width: 700px;
+      z-index: 10;
+      display: none;
+      background: var(--glass);
+      backdrop-filter: blur(15px);
+      border-radius: 40px;
+      border: 1px solid rgba(255,255,255,0.2);
+      box-shadow: 0 25px 50px rgba(0,0,0,0.15);
+    }
+
+    .handwritten {
+      font-family: 'Dancing Script', cursive;
+      font-size: clamp(28px, 6vw, 46px);
+      opacity: 0;
+      transition: opacity 1.5s ease-in-out;
+      display: none;
+      line-height: 1.4;
+    }
+
+    .reason-item {
+      margin-bottom: 25px;
+      font-size: 1.2rem;
+      font-weight: 300;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: all 1.2s ease;
+      padding: 10px;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .button-zone {
+      position: relative;
+      width: 100%;
+      height: 200px;
+      margin-top: 30px;
+      touch-action: none;
+    }
+
+    button.interactive {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      padding: 18px 40px;
+      font-size: 18px;
+      font-weight: 700;
+      border-radius: 100px;
+      border: none;
+      cursor: pointer;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+      transition: transform .15s ease, background .12s ease;
+      min-width: 200px;
+    }
+
+    #yesBtn { left: 5%; background: #fefae0; color: #344e41; z-index: 100; }
+    #noBtn { left: 60%; background: #bc6c25; color: #fff; }
+
+    .hidden { display: none !important; }
+    .visible { opacity: 1 !important; display: block !important; }
+  </style>
+</head>
+
+<body>
+  <audio id="bgMusic" loop>
+    <source src="You will get over me.mp3" type="audio/mpeg">
+  </audio>
+
+  <div id="overlay">
+    <button id="startBtn">Just Click & Open💌</button>
+  </div>
+
+  <div id="heart-bg"></div>
+
+  <div id="story-container">
+    <div id="text-stage" class="handwritten"></div>
+
+    <div id="reasons-ui" class="hidden">
+      <h2 class="handwritten visible" style="margin-bottom: 40px; border-bottom: 2px solid #fefae0;">Why you’re my favorite human</h2>
+      <div id="reasons-list"></div>
+    </div>
+
+    <div id="final-stage" class="hidden">
+      <h2 class="handwritten visible" id="question-text">Anna, Will you be my valentine as your bestestest friend?</h2>
+      <div class="button-zone" id="zone">
+        <button id="yesBtn" class="interactive">Yes, obviously!</button>
+        <button id="noBtn" class="interactive">No 🙄</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const music = document.getElementById('bgMusic');
+    music.volume = 0.7;
+
+    const story = [
+      { text: "Hey Annamol,", time: 2000 },
+      { text: "Valentine’s Day isn’t only for couples…", time: 3000 },
+      { text: "It’s also for people who make our life lighter💫", time: 3000 },
+      { text: "And For me… that’s you.", time: 3000 }
+    ];
+
+    const reasons = [
+      "You make conversations feel easy, even on heavy days.",
+      "You make ordinary moments feel lighter just by being there.",
+      "Some days are better simply because I talked to you.",
+      "You’ve been part of more good memories than you probably realize."
+    ];
+
+    const yesPhrases = ["Are you sure??🤨", "You can't change it later..✋", "Forever... Sure??🥹"];
+    let currentYesStep = 0;
+
+    const startBtn = document.getElementById('startBtn');
+    const overlay = document.getElementById('overlay');
+    const storyContainer = document.getElementById('story-container');
+    const textStage = document.getElementById('text-stage');
+    const reasonsUi = document.getElementById('reasons-ui');
+    const finalStage = document.getElementById('final-stage');
+    const yesBtn = document.getElementById('yesBtn');
+    const noBtn = document.getElementById('noBtn');
+
+    startBtn.addEventListener('click', () => {
+      overlay.style.opacity = '0';
+      setTimeout(() => {
+        overlay.style.display = 'none';
+        storyContainer.style.display = 'block';
+        music.play();
+        playStory();
+      }, 1000);
+    });
+
+    function initHearts() {
+      const container = document.getElementById('heart-bg');
+      for (let i = 0; i < 12; i++) {
+        const heart = document.createElement('div');
+        heart.className = 'heart';
+        heart.innerHTML = '❤️';
+        heart.style.left = Math.random() * 100 + 'vw';
+        heart.style.animationDelay = (Math.random() * 20) + 's';
+        container.appendChild(heart);
+      }
+    }
+
+    async function playStory() {
+      for (let line of story) {
+        textStage.innerText = line.text;
+        textStage.classList.add('visible');
+        
+        if (line.text.includes("today")) {
+          // Cannon Fireworks
+          confetti({ particleCount: 150, spread: 70, origin: { x: 0, y: 0.6 }, colors: ['#fefae0', '#ffffff'] });
+          confetti({ particleCount: 150, spread: 70, origin: { x: 1, y: 0.6 }, colors: ['#fefae0', '#ffffff'] });
+        }
+
+        await new Promise(r => setTimeout(r, line.time));
+        textStage.style.opacity = "0";
+        await new Promise(r => setTimeout(r, 1200));
+        textStage.classList.remove('visible');
+        textStage.style.opacity = "1";
+      }
+      showReasons();
+    }
+
+    async function showReasons() {
+      reasonsUi.classList.remove('hidden');
+      const list = document.getElementById('reasons-list');
+      for (let reason of reasons) {
+        const div = document.createElement('div');
+        div.className = 'reason-item';
+        div.innerText = reason;
+        list.appendChild(div);
+        await new Promise(r => setTimeout(r, 100));
+        div.style.opacity = "1";
+        div.style.transform = "translateY(0)";
+        await new Promise(r => setTimeout(r, 3500));
+      }
+      await new Promise(r => setTimeout(r, 1500));
+      reasonsUi.classList.add('hidden');
+      showFinal();
+    }
+
+    function showFinal() {
+      finalStage.classList.remove('hidden');
+    }
+
+    function moveNo(px, py) {
+      const zone = document.getElementById('zone').getBoundingClientRect();
+      const b = noBtn.getBoundingClientRect();
+      let dx = (b.left + b.width / 2) - px;
+      let dy = (b.top + b.height / 2) - py;
+      let mag = Math.hypot(dx, dy) || 1;
+      
+      let newLeft = (b.left - zone.left) + (dx / mag) * 150;
+      let newTop = (b.top - zone.top) + (dy / mag) * 150;
+
+      newLeft = Math.max(0, Math.min(newLeft, zone.width - b.width));
+      newTop = Math.max(0, Math.min(newTop, zone.height - b.height));
+
+      noBtn.style.left = newLeft + "px";
+      noBtn.style.top = newTop + "px";
+    }
+
+    document.getElementById('zone').addEventListener("pointermove", e => {
+      const b = noBtn.getBoundingClientRect();
+      const d = Math.hypot((b.left + b.width/2) - e.clientX, (b.top + b.height/2) - e.clientY);
+      if (d < 130) moveNo(e.clientX, e.clientY);
+    });
+
+    yesBtn.addEventListener('click', () => {
+      if (currentYesStep < yesPhrases.length) {
+        yesBtn.innerText = yesPhrases[currentYesStep];
+        currentYesStep++;
+      } else {
+        document.getElementById('question-text').innerText = "YAY! BESTIES FOREVER!✨";
+        document.getElementById('zone').innerHTML = "<h1 style='font-size: 80px;'>🫂🥂🍕</h1>";
+        const end = Date.now() + (12 * 1000); // 12 Seconds of celebration
+        (function frame() {
+          confetti({ particleCount: 5, angle: 60, spread: 55, origin: { x: 0 }, colors: ['#fefae0', '#ffffff'] });
+          confetti({ particleCount: 5, angle: 120, spread: 55, origin: { x: 1 }, colors: ['#fefae0', '#ffffff'] });
+          if(Math.random() > 0.8) confetti({ particleCount: 70, spread: 360, origin: { x: Math.random(), y: Math.random() - 0.2 } });
+          if (Date.now() < end) requestAnimationFrame(frame);
+        }());
+      }
+    });
+
+    initHearts();
+  </script>
+</body>
+</html>
