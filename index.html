@@ -289,13 +289,34 @@
         yesBtn.innerText = yesPhrases[currentYesStep];
         currentYesStep++;
       } else {
-        document.getElementById('question-text').innerText = "YAY! BESTIES FOREVER!✨";
-        document.getElementById('zone').innerHTML = "<h1 style='font-size: 80px;'>🫂🥂🍕</h1>";
-        const end = Date.now() + (12 * 1000); // 12 Seconds of celebration
+        // Updated Finale: Replace emojis with your 5 Star image
+        document.getElementById('question-text').innerText = "YAY! BESTIES FOREVER!🥂";
+        
+        // This line removes the buttons and inserts your image
+        document.getElementById('zone').innerHTML = `
+          <div style="display: flex; flex-direction: column; align-items: center; gap: 20px;">
+            <img src="5star.jpg" alt="5 Star Chocolate" style="width: 100%; max-width: 400px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); animation: pop 0.5s ease;">
+            <p style="font-family: 'Dancing Script', cursive; font-size: 24px;">Eat 5 Star, Do nothing! 🍫</p>
+            <p style="font-family: 'Dancing Script', cursive; font-size: 32px;">I will meet u soooonn....</p>
+          </div>
+        `;
+        
+        const end = Date.now() + (10 * 1000); 
+        const colors = ['#fefae0', '#ffffff', '#a3b18a'];
+
         (function frame() {
-          confetti({ particleCount: 5, angle: 60, spread: 55, origin: { x: 0 }, colors: ['#fefae0', '#ffffff'] });
-          confetti({ particleCount: 5, angle: 120, spread: 55, origin: { x: 1 }, colors: ['#fefae0', '#ffffff'] });
-          if(Math.random() > 0.8) confetti({ particleCount: 70, spread: 360, origin: { x: Math.random(), y: Math.random() - 0.2 } });
+          confetti({ particleCount: 5, angle: 60, spread: 55, origin: { x: 0 }, colors: colors });
+          confetti({ particleCount: 5, angle: 120, spread: 55, origin: { x: 1 }, colors: colors });
+          if(Math.random() > 0.8) {
+            confetti({
+                particleCount: 80,
+                startVelocity: 35,
+                spread: 360,
+                ticks: 60,
+                origin: { x: Math.random(), y: Math.random() - 0.2 },
+                colors: colors
+            });
+          }
           if (Date.now() < end) requestAnimationFrame(frame);
         }());
       }
